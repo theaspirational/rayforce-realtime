@@ -1,0 +1,14 @@
+[package]
+name = "rayforce-realtime"
+version = "0.1.0"
+edition = "2021"
+description = "Transport-agnostic query subscriptions: dependency tracking, invalidation matching, delivery-time auth filtering. Pair with SSE/WebSocket adapters in app code."
+license = "MIT"
+
+[dependencies]
+ray-datom = { path = "../ray-datom" }
+ray-transactor = { path = "../ray-transactor" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
