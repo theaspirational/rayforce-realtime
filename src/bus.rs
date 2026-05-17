@@ -152,6 +152,15 @@ fn overlaps(deps: &[Dependency], touched: &TouchedKeys) -> bool {
                     return true;
                 }
             }
+            Dependency::EntityType(t) => {
+                if touched
+                    .entities
+                    .iter()
+                    .any(|e| entity_type_matches(e.0.as_str(), t))
+                {
+                    return true;
+                }
+            }
             Dependency::Attr(a) => {
                 if touched.attrs.contains(a) {
                     return true;
@@ -165,6 +174,13 @@ fn overlaps(deps: &[Dependency], touched: &TouchedKeys) -> bool {
         }
     }
     false
+}
+
+fn entity_type_matches(entity_id: &str, expected_type: &str) -> bool {
+    match entity_id.split_once('/') {
+        Some((prefix, _)) => prefix == expected_type,
+        None => entity_id == expected_type,
+    }
 }
 
 #[cfg(test)]
@@ -260,6 +276,26 @@ mod tests {
         // No scopes touched so the bus skips the scope-readability gate.
         let evs = bus.match_commit(&commit(&[], &["task/T1"], &["task/state"]));
         assert_eq!(evs.len(), 2);
+    }
+
+    #[test]
+    fn entity_type_dep_matches_any_entity_with_that_prefix() {
+        let mut bus = RealtimeBus::new();
+        let auth = alice_with(&["scope/A"], "read");
+        bus.subscribe(
+            auth.clone(),
+            QuerySpec::new("tasks-list", serde_json::json!({})),
+            vec![Dependency::EntityType("task".into())],
+            Permission::new("read"),
+        );
+
+        // Touching a task entity matches even though id was not in deps.
+        let evs = bus.match_commit(&commit(&[], &["task/abc"], &[]));
+        assert_eq!(evs.len(), 1);
+
+        // Touching only a non-matching entity does not match.
+        let evs = bus.match_commit(&commit(&[], &["run/xyz"], &[]));
+        assert!(evs.is_empty());
     }
 
     #[test]

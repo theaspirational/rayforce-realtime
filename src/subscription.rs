@@ -30,10 +30,16 @@ impl QuerySpec {
 
 /// A pattern that a subscription cares about. Matches the `TouchedKeys`
 /// emitted with each commit.
+///
+/// `EntityType` matches by the prefix of an entity id — the substring
+/// before the first `/`. For example, a dep `EntityType("task")` matches
+/// any touched entity whose id starts with `task/`. This lets a UI list
+/// view say "I care about any task changing" without enumerating ids.
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Dependency {
     Scope(ScopeId),
     Entity(EntityId),
+    EntityType(String),
     Attr(String),
     View(String),
 }
