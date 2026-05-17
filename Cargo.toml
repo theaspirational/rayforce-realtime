@@ -6,8 +6,8 @@ description = "Transport-agnostic query subscriptions: dependency tracking, inva
 license = "MIT"
 
 [dependencies]
-ray-datom = { path = "../ray-datom" }
-ray-transactor = { path = "../ray-transactor" }
+ray-datom = { git = "https://github.com/theaspirational/ray-datom.git", rev = "330664d476e3e309afe7bfec03b5bfaf75a76c97" }
+ray-transactor = { git = "https://github.com/theaspirational/ray-transactor.git", rev = "7dce675784c1bd51121dbd8f127dc1648edb9a24" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
